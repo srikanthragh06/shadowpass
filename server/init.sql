@@ -1,13 +1,24 @@
--- Vault table
 CREATE TABLE IF NOT EXISTS "Vaults" (
-    "authToken" VARCHAR(255) PRIMARY KEY,
+    "id" SERIAL PRIMARY KEY,
+    "masterToken" TEXT UNIQUE NOT NULL,
     "username" TEXT NOT NULL,
     "vault" TEXT
 );
 
--- Settings table
+CREATE INDEX idx_vault_mastertoken_username
+ON "Vaults" ("masterToken", "username");
+
 CREATE TABLE IF NOT EXISTS "Settings" (
-    "authToken" VARCHAR(255) PRIMARY KEY,
-    "autoLockTimeInterval" INTEGER NOT NULL,
-    "autoLockOnSiteRefresh" BOOLEAN NOT NULL
+    "id" SERIAL PRIMARY KEY,
+    "vaultId" INTEGER NOT NULL,
+    "autoLockTimeInterval" INTEGER NOT NULL DEFAULT 3600000,
+    "autoLockOnSiteRefresh" BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT fk_vault
+        FOREIGN KEY ("vaultId")
+        REFERENCES "Vaults"("id")
+        ON DELETE CASCADE
 );
+
+CREATE INDEX idx_settings_vaultid
+ON "Settings" ("vaultId");
+

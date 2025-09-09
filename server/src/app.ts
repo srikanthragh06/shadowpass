@@ -9,6 +9,7 @@ import {
 } from "./middlewares/handlers";
 import { sendSuccessResponse } from "./utils/responseTemplates";
 import vaultsRouter from "./routers/vaults";
+import authRouter from "./routers/auth";
 
 const app = express(); // Create an Express application instance
 
@@ -41,7 +42,8 @@ app.get("/hi", (req, res, next) => {
 });
 
 // Routers
-app.use("/vaults", vaultsRouter); // Mount the vaults router
+app.use("/auth", authRouter);
+app.use("/vaults", vaultsRouter);
 
 // Apply the global error handler to catch errors from any route or middleware
 app.use(globalErrorHandler);

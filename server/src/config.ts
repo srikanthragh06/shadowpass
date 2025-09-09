@@ -13,6 +13,7 @@ const requiredEnv = [
     "PG_HOST",
     "PG_PORT",
     "PG_DB",
+    "JWT_SECRET",
 ];
 
 requiredEnv.forEach((key) => {
@@ -31,3 +32,4 @@ export const PG_PASSWORD = process.env.PG_PASSWORD!;
 export const PG_HOST = process.env.PG_HOST!;
 export const PG_PORT = Number(process.env.PG_PORT!);
 export const PG_DB = process.env.PG_DB!;
+export const JWT_SECRET = process.env.JWT_SECRET!;

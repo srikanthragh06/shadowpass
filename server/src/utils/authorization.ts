@@ -2,13 +2,15 @@ import { NextFunction, Request, Response } from "express";
 import { sendClientSideError } from "./responseTemplates";
 
 /**
- * Extracts the authorization token from the Authorization header of the request.
- * @param req The Request object.
- * @param res The Response object.
- * @param next The NextFunction.
- * @returns The extracted authorization token or null if the header is invalid.
+ * A middleware function that checks for the presence of the Authorization header
+ * and attempts to extract the JWT token from it.
+ * @param req The Express request object
+ * @param res The Express response object
+ * @param next The Express next middleware function
+ * @returns The extracted JWT token if successful, or sends a 401 Unauthorized
+ * response if there's an error
  */
-export const getAuthTokenFromHeader = (
+export const checkAndGetJWTToken = (
     req: Request,
     res: Response,
     next: NextFunction
@@ -16,7 +18,6 @@ export const getAuthTokenFromHeader = (
     try {
         const authHeader = req.headers.authorization;
         if (authHeader === undefined || authHeader === null) {
-            // Missing Authorization header
             return sendClientSideError(
                 req,
                 res,
@@ -25,10 +26,8 @@ export const getAuthTokenFromHeader = (
             );
         }
 
-        // Check if it starts with 'Bearer ' and extract the token
         const parts = authHeader.split(" ");
         if (parts.length !== 2 || parts[0] !== "Bearer") {
-            // Invalid Authorization header
             return sendClientSideError(
                 req,
                 res,

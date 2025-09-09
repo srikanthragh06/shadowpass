@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { getAuthTokenFromHeader } from "../utils/authorization";
 import {
     sendClientSideError,
     sendSuccessResponse,
@@ -7,11 +6,10 @@ import {
 import { queryClient, transaction } from "../db/postgres";
 
 /**
- * Handles the GET /vaults endpoint, which returns the vault associated with
- * the given auth token.
- * @param {Request} request - The express request object.
- * @param {Response} response - The express response object.
- * @param {NextFunction} next - The next middleware function to call.
+ * Handles a GET request to retrieve a vault for a given username.
+ * @param request The Express request object.
+ * @param response The Express response object.
+ * @param next The Express next middleware function.
  */
 export const getVaultHandler = async (
     request: Request,
@@ -19,38 +17,29 @@ export const getVaultHandler = async (
     next: NextFunction
 ) => {
     try {
-        /**
-         * Get the auth token from the request headers.
-         * This will be used to identify the user that is making the request.
-         */
-        const authToken = getAuthTokenFromHeader(request, response, next);
+        const { username }: { username: string } = request as any;
 
-        /**
-         * Run a transaction that will either return the vault associated with
-         * the given auth token, or return an error if the vault does not exist.
-         */
         await transaction(async (client) => {
-            const { rows } = await queryClient(
+            // Retrieve the vault for the given username
+            const { rows: rowsWithVault } = await queryClient(
                 client,
-                `SELECT vault FROM "Vaults" WHERE "authToken" = $1;`,
-                [authToken]
+                `SELECT vault FROM "Vaults" WHERE "username" = $1;`,
+                [username]
             );
 
-            /**
-             * If the vault does not exist, return an error.
-             */
-            if (rows.length === 0 || !rows[0].vault)
+            if (rowsWithVault.length === 0)
+                // If the vault is not found, return a 401 Unauthorized response
                 return sendClientSideError(
                     request,
                     response,
-                    `Vault not found for authToken: ${authToken}!`,
+                    `Vault not found for username: ${username}!`,
                     401
                 );
 
-            /**
-             * If the vault exists, return the vault to the client.
-             */
-            const vault = rows[0].vault;
+            // Extract the vault from the query result
+            const vault = rowsWithVault[0].vault;
+
+            // Return a success response with the vault
             return sendSuccessResponse(
                 request,
                 response,
@@ -60,98 +49,113 @@ export const getVaultHandler = async (
             );
         });
     } catch (err) {
+        // If there's an error, call next(err) to pass it to the next middleware
         next(err);
     }
 };
 
 /**
- * Handles the POST /vaults endpoint, which creates a new vault and
- * assigns it to the user with the given username.
- * @param {Request} request - The express request object.
- * @param {Response} response - The express response object.
- * @param {NextFunction} next - The next middleware function to call.
+ * Handles a request to update the vault for a given username.
+ * @param request The express request object
+ * @param response The express response object
+ * @param next The express next middleware function
  */
-export const createNewVaultHandler = async (
+export const updateVaultHandler = async (
     request: Request,
     response: Response,
     next: NextFunction
 ) => {
     try {
-        /**
-         * Extract the username from the request body.
-         * This will be used to identify the user that the vault belongs to.
-         */
-        const { username }: { username: string } = request.body;
+        const { username }: { username: string } = request as any;
+        const { vault } = request.body;
 
         /**
-         * Get the auth token from the request headers.
-         * This will be used to identify the user that is making the request.
-         */
-        const authToken = getAuthTokenFromHeader(request, response, next);
-
-        /**
-         * Run a transaction that will either create a new vault and assign it
-         * to the user with the given username, or return an error if the
-         * vault already exists.
+         * Transaction to update the vault for the given username
          */
         await transaction(async (client) => {
-            /**
-             * Check if a vault with the given auth token already exists.
-             * If it does, return an error.
-             */
-            const { rows: rowsWithAuthToken } = await queryClient(
-                client,
-                `SELECT 1 FROM "Vaults" WHERE "authToken" = $1;`,
-                [authToken]
-            );
-            if (rowsWithAuthToken.length > 0)
-                return sendClientSideError(
-                    request,
-                    response,
-                    `Vault with authToken: ${authToken} already exists!`,
-                    400
-                );
-
-            /**
-             * Check if a vault with the given username already exists.
-             * If it does, return an error.
-             */
             const { rows: rowsWithUsername } = await queryClient(
                 client,
                 `SELECT 1 FROM "Vaults" WHERE "username" = $1;`,
                 [username]
             );
-            if (rowsWithUsername.length > 0)
+            if (rowsWithUsername.length === 0)
+                // If the vault is not found, return a 400 Bad Request response
                 return sendClientSideError(
                     request,
                     response,
-                    `Vault with username: ${username} already exists!`,
+                    `Vault with username: ${username} does not exist!`,
                     400
                 );
 
-            /**
-             * Create a new vault and assign it to the user with the given username.
-             */
+            // Update the vault for the given username
             await queryClient(
                 client,
-                `INSERT INTO "Vaults" ("authToken","username") VALUES ($1,$2);`,
-                [authToken, username]
+                `UPDATE "Vaults" SET "vault" = $1 WHERE "username" = $2;`,
+                [vault, username]
             );
 
-            /**
-             * Return a success response with a message and a 200 status code.
-             */
+            // Return a success response
             return sendSuccessResponse(
                 request,
                 response,
-                `Vault created successfully for user with username:${username}!`,
+                `Vault updated successfully for user with username:${username}!`,
                 200
             );
         });
     } catch (err) {
-        /**
-         * If an error occurs, call the next middleware function with the error.
-         */
+        // If there's an error, call next(err) to pass it to the next middleware
+        next(err);
+    }
+};
+
+/**
+ * Handles a request to delete the vault for a given username.
+ * @param request The Express request object.
+ * @param response The Express response object.
+ * @param next The Express next middleware function.
+ */
+export const deleteVaultHandler = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+) => {
+    try {
+        const { username }: { username: string } = request as any;
+
+        // Start a transaction to handle multiple SQL queries
+        await transaction(async (client) => {
+            // Retrieve the vault for the given username
+            const { rows: rowsWithUsername } = await queryClient(
+                client,
+                `SELECT 1 FROM "Vaults" WHERE "username" = $1;`,
+                [username]
+            );
+
+            // If the vault is not found, return a 401 Unauthorized response
+            if (rowsWithUsername.length === 0)
+                return sendClientSideError(
+                    request,
+                    response,
+                    `Vault not found for username: ${username}!`,
+                    401
+                );
+
+            // Delete the vault for the given username
+            await queryClient(
+                client,
+                `DELETE FROM "Vaults" WHERE "username" = $1;`,
+                [username]
+            );
+            // Return a success response with a message
+            return sendSuccessResponse(
+                request,
+                response,
+                "Vault deleted successfully!",
+                200
+            );
+        });
+    } catch (err) {
+        // If there's an error, call next(err) to pass it to the next middleware
         next(err);
     }
 };
