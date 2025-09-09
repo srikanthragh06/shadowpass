@@ -96,7 +96,10 @@ export const transaction = async (
         const client: PoolClient = await pool.connect();
         try {
             // Start a new transaction, execute operations and commit transaction
-            await queryClient(client, "BEGIN");
+            await queryClient(
+                client,
+                "BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ"
+            );
             await operations(client);
             await queryClient(client, "COMMIT");
             client.release();
