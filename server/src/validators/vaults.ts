@@ -9,3 +9,12 @@ export const updateVaultValidation = [
         .withMessage("Vault must be a string"),
     validateErrors,
 ];
+
+export const changeMasterPasswordValidation = [
+    body("masterToken")
+        .exists()
+        .withMessage("MasterToken is required")
+        .isString()
+        .withMessage("MasterToken must be a string"),
+    validateErrors,
+];

@@ -11,7 +11,7 @@ ON "Vaults" ("masterToken", "username");
 CREATE TABLE IF NOT EXISTS "Settings" (
     "id" SERIAL PRIMARY KEY,
     "vaultId" INTEGER NOT NULL,
-    "autoLockTimeInterval" INTEGER NOT NULL DEFAULT 3600000,
+    "autoLockTimeInterval" INTEGER NOT NULL DEFAULT 3600,
     "autoLockOnSiteRefresh" BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT fk_vault
         FOREIGN KEY ("vaultId")

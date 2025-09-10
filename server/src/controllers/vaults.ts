@@ -159,3 +159,43 @@ export const deleteVaultHandler = async (
         next(err);
     }
 };
+
+/**
+ * Handles a request to change the master password for a given username.
+ * @param request The express request object
+ * @param response The express response object
+ * @param next The express next middleware function
+ */
+export const changeMasterPasswordHandler = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+) => {
+    try {
+        const { username }: { username: string } = request as any;
+        const { masterToken } = request.body;
+
+        /**
+         * Transaction to change the master password for the given username
+         */
+        await transaction(async (client) => {
+            // Update the master password for the given username
+            await queryClient(
+                client,
+                `UPDATE "Vaults" SET "masterToken" = $1 WHERE "username" = $2`,
+                [masterToken, username]
+            );
+
+            // Return a success response with a message
+            return sendSuccessResponse(
+                request,
+                response,
+                "Master password changed successfully!",
+                200
+            );
+        });
+    } catch (err) {
+        // If there's an error, call next(err) to pass it to the next middleware
+        next(err);
+    }
+};
