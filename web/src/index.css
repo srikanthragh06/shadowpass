@@ -1,8 +1,5 @@
 @import "tailwindcss";
 
-@import "tailwindcss/preflight";
-@tailwind utilities;
-
 @theme {
     --font-size-xs: 0.625rem; /* 10px */
     --font-size-sm: 0.75rem; /* 12px */
@@ -15,7 +12,37 @@
     --font-size-5xl: 2rem; /* 32px */
     --font-size-6xl: 2.5rem; /* 40px */
 
-    --color-accent-light: #ffd6a5;
-    --color-accent: #ffab00;
-    --color-accent-dark: #cc8800;
+    --color-primary-1: #04011a;
+    --color-primary-2: #080230;
+    --color-primary-3: #0a033b;
+}
+
+@layer components {
+    .btn-modern {
+        @apply bg-white text-primary-3 font-bold 
+      px-6 py-2 rounded-xl 
+      border border-gray-200 shadow-sm 
+      hover:bg-gray-50 active:scale-95 
+      transition duration-150 
+      w-32 
+      cursor-pointer 
+      focus:outline-none focus:ring-2 focus:ring-primary-3 focus:ring-offset-1;
+
+        /* Responsive adjustments */
+        @apply text-sm px-4 py-2 w-28 sm:text-base sm:px-5 sm:py-2.5 sm:w-32 md:text-lg md:px-6 md:py-3 md:w-36;
+    }
+}
+
+.kode-mono-regular {
+    font-family: "Kode Mono", monospace;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.kode-mono-bold {
+    font-family: "Kode Mono", monospace;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
 }

@@ -4,22 +4,44 @@ import {
     type RouteObject,
 } from "react-router-dom";
 import WelcomePage from "./pages/welcome/WelcomePage";
+import "./index.css";
+import type { JSX } from "react";
 
-function App() {
+/**
+ * The main application component.
+ */
+function App(): JSX.Element {
+    /**
+     * The router configuration for the application.
+     */
     const appRouter: RouteObject[] = [
         {
+            /**
+             * The route for the welcome page.
+             */
             path: "/",
+            /**
+             * The element to render for the welcome page.
+             */
             element: <WelcomePage />,
         },
     ];
 
     return (
         <div
+            /**
+             * The styles for the application container.
+             */
             className="w-full h-full min-h-screen
                         flex flex-col items-center
-                        text-3xl bg-black text-white"
+                        text-base bg-primary-1 text-white"
         >
-            <RouterProvider router={createBrowserRouter(appRouter)} />
+            <RouterProvider
+                /**
+                 * The router for the application.
+                 */
+                router={createBrowserRouter(appRouter)}
+            />
         </div>
     );
 }
