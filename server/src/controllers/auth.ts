@@ -25,8 +25,8 @@ export const registerHandler = async (
         await transaction(async (client) => {
             const { rows: rowsFromUsernameAndMasterToken } = await queryClient(
                 client,
-                `SELECT 1 FROM "Vaults" WHERE "username" = $1 AND "masterToken" = $2;`,
-                [username, masterToken]
+                `SELECT 1 FROM "Vaults" WHERE "username" = $1;`,
+                [username]
             );
             if (rowsFromUsernameAndMasterToken.length > 0) {
                 // If the user already exists, return a 401 Unauthorized response
