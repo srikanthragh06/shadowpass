@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS "Vaults" (
     "id" SERIAL PRIMARY KEY,
-    "masterToken" TEXT UNIQUE NOT NULL,
+    "masterToken" TEXT NOT NULL,
     "username" TEXT UNIQUE NOT NULL,
     "vault" TEXT
 );
