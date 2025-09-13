@@ -1,17 +1,26 @@
+// Import the main layout and signup logic hook
 import MainPage from "../../components/MainPage";
-
-// SignupPage renders the registration form for new users to create an account.
-// It uses the MainPage layout and includes fields for username and master password.
+import useSignupPage from "../../hooks/useSignupPage";
 
 /**
- * The signup page component.
+ * SignupPage renders the registration form for new users to create an account.
+ * It uses the MainPage layout and includes fields for username and master password.
  *
- * This component renders a form for the user to signup and creates a new account.
- *
- * @returns {JSX.Element} - The component.
+ * @component
+ * @returns {JSX.Element} The rendered signup page component.
  */
 
 const SignupPage = () => {
+    // Destructure state and handlers from the signup page hook
+    const {
+        signupFormDetails,
+        setSignupFormDetails,
+        handleSignup,
+        clientSignupError,
+        signupMutation,
+        signupIsLoading,
+    } = useSignupPage();
+
     // Render the signup form inside the MainPage layout
     return (
         <MainPage className="items-center">
@@ -39,6 +48,13 @@ const SignupPage = () => {
                         id="username"
                         placeholder="Username"
                         className="input-field max-w-80 w-11/12"
+                        value={signupFormDetails.username}
+                        onChange={(e) =>
+                            setSignupFormDetails({
+                                ...signupFormDetails,
+                                username: e.target.value,
+                            })
+                        }
                     />
 
                     {/* Master Password input field */}
@@ -47,6 +63,13 @@ const SignupPage = () => {
                         id="master-password"
                         placeholder="Master Password"
                         className="input-field max-w-80 w-11/12"
+                        value={signupFormDetails.masterPassword}
+                        onChange={(e) =>
+                            setSignupFormDetails({
+                                ...signupFormDetails,
+                                masterPassword: e.target.value,
+                            })
+                        }
                     />
 
                     {/* Confirm Master Password input field */}
@@ -55,11 +78,40 @@ const SignupPage = () => {
                         id="confirm-master-password"
                         placeholder="Confirm Master Password"
                         className="input-field max-w-80 w-11/12"
+                        value={signupFormDetails.confirmMasterPassword}
+                        onChange={(e) =>
+                            setSignupFormDetails({
+                                ...signupFormDetails,
+                                confirmMasterPassword: e.target.value,
+                            })
+                        }
                     />
 
-                    {/* Signup button */}
-                    <button className="btn-modern mt-4 sm:text-sm text-xs px-3 py-2">
-                        Signup
+                    {/* Error message for signup failure from API */}
+                    {signupMutation.data?.error && (
+                        <p className="text-red-500 text-xs text-center">
+                            {signupMutation.data.error}
+                        </p>
+                    )}
+                    {/* Error message for client-side validation */}
+                    {clientSignupError && (
+                        <p className="text-red-500 text-xs text-center">
+                            {clientSignupError}
+                        </p>
+                    )}
+                    {/* Success message after signup */}
+                    {signupMutation.data?.data?.message && (
+                        <p className="text-green-500 text-xs text-center">
+                            Signup successful!
+                        </p>
+                    )}
+
+                    {/* Signup button, shows loading state if submitting */}
+                    <button
+                        className="btn-modern mt-4 sm:text-sm text-xs px-3 py-2"
+                        onClick={(e) => handleSignup(e)}
+                    >
+                        {signupIsLoading ? "..." : "Signup"}
                     </button>
 
                     {/* Link to login page for existing users */}
@@ -75,5 +127,4 @@ const SignupPage = () => {
     );
 };
 
-// Export the SignupPage component as default
 export default SignupPage;
