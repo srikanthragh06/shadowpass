@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import MainPage from "../../components/MainPage";
 import useLoginPage from "../../hooks/useLoginPage";
 
@@ -9,6 +10,8 @@ import useLoginPage from "../../hooks/useLoginPage";
  * @returns {JSX.Element} The rendered login page component.
  */
 const LoginPage = () => {
+    const navigate = useNavigate();
+
     // Destructure state and handlers from the login page hook
     const {
         loginFormDetails,
@@ -28,7 +31,7 @@ const LoginPage = () => {
             >
                 {/* App title */}
                 <div className="sm:text-5xl text-4xl kode-mono-bold mt-2 mb-10">
-                    ShadowPass
+                    shadowPass
                 </div>
                 {/* Login form */}
                 <form className="flex flex-col space-y-4 items-center w-full ">
@@ -92,7 +95,10 @@ const LoginPage = () => {
                     {/* Link to registration page for new users */}
                     <p className="text-xs text-gray-500 mb-4 mt-6 text-center">
                         Don't have an account yet?{" "}
-                        <span className="cursor-pointer hover:text-gray-400 active:text-gray-300 transition">
+                        <span
+                            className="cursor-pointer hover:text-gray-400 active:text-gray-300 transition"
+                            onClick={() => navigate("/signup")}
+                        >
                             Register here!
                         </span>
                     </p>

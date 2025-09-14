@@ -1,4 +1,5 @@
 // Import the main layout and signup logic hook
+import { useNavigate } from "react-router-dom";
 import MainPage from "../../components/MainPage";
 import useSignupPage from "../../hooks/useSignupPage";
 
@@ -11,6 +12,8 @@ import useSignupPage from "../../hooks/useSignupPage";
  */
 
 const SignupPage = () => {
+    const navigate = useNavigate();
+
     // Destructure state and handlers from the signup page hook
     const {
         signupFormDetails,
@@ -26,7 +29,7 @@ const SignupPage = () => {
         <MainPage className="items-center">
             {/* App title */}
             <div className="sm:text-5xl text-4xl kode-mono-bold mt-16">
-                ShadowPass
+                shadowPass
             </div>
 
             {/* Signup form container */}
@@ -117,7 +120,10 @@ const SignupPage = () => {
                     {/* Link to login page for existing users */}
                     <p className="text-xs text-gray-500 mb-0 mt-2 ">
                         Already have an account?{" "}
-                        <span className="cursor-pointer hover:text-gray-400 active:text-gray-300 transition">
+                        <span
+                            className="cursor-pointer hover:text-gray-400 active:text-gray-300 transition"
+                            onClick={() => navigate("/login")}
+                        >
                             Login here!
                         </span>
                     </p>
