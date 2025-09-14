@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import MainPage from "../../components/MainPage";
 import useSignupPage from "../../hooks/useSignupPage";
+import PasswordInput from "../../components/PasswordInput";
 
 /**
  * SignupPage renders the registration form for new users to create an account.
@@ -61,33 +62,28 @@ const SignupPage = () => {
                     />
 
                     {/* Master Password input field */}
-                    <input
-                        type="password"
-                        id="master-password"
-                        placeholder="Master Password"
-                        className="input-field max-w-80 w-11/12"
+                    <PasswordInput
+                        className="max-w-80 w-11/12"
                         value={signupFormDetails.masterPassword}
-                        onChange={(e) =>
+                        onChange={(value) =>
                             setSignupFormDetails({
                                 ...signupFormDetails,
-                                masterPassword: e.target.value,
+                                masterPassword: value,
                             })
                         }
+                        placeholder="Master Password"
                     />
-
                     {/* Confirm Master Password input field */}
-                    <input
-                        type="password"
-                        id="confirm-master-password"
-                        placeholder="Confirm Master Password"
-                        className="input-field max-w-80 w-11/12"
+                    <PasswordInput
+                        className="max-w-80 w-11/12"
                         value={signupFormDetails.confirmMasterPassword}
-                        onChange={(e) =>
+                        onChange={(value) =>
                             setSignupFormDetails({
                                 ...signupFormDetails,
-                                confirmMasterPassword: e.target.value,
+                                confirmMasterPassword: value,
                             })
                         }
+                        placeholder="Confirm Master Password"
                     />
 
                     {/* Error message for signup failure from API */}

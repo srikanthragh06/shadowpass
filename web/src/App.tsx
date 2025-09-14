@@ -9,6 +9,7 @@ import type { JSX } from "react";
 import SignupPage from "./pages/signup/SignupPage";
 import NotFoundPage from "./pages/notFound/NotFoundPage";
 import LoginPage from "./pages/login/LoginPage";
+import DashboardPage from "./pages/dashboard/Dashboard";
 
 /**
  * The main application component.
@@ -58,6 +59,18 @@ function App(): JSX.Element {
              * The element to render for the login page.
              */
             element: <LoginPage />,
+        },
+        {
+            /**
+             * The route for the dashboard page.
+             *
+             * This route matches the URL path "/dashboard" and renders the <DashboardPage /> element.
+             */
+            path: "/dashboard",
+            /**
+             * The element to render for the dashboard page.
+             */
+            element: <DashboardPage />,
         },
         {
             /**

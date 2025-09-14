@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import MainPage from "../../components/MainPage";
 import useLoginPage from "../../hooks/useLoginPage";
+import PasswordInput from "../../components/PasswordInput";
 
 /**
  * LoginPage renders the login form for existing users to authenticate.
@@ -50,17 +51,15 @@ const LoginPage = () => {
                     />
 
                     {/* Master Password input field */}
-                    <input
-                        type="password"
-                        id="master-password"
-                        placeholder="Master Password"
-                        className="input-field max-w-60 w-11/12"
-                        onChange={(e) =>
+                    <PasswordInput
+                        value={loginFormDetails.masterPassword}
+                        onChange={(value) =>
                             setLoginFormDetails({
                                 ...loginFormDetails,
-                                masterPassword: e.target.value,
+                                masterPassword: value,
                             })
                         }
+                        placeholder="Master Password"
                     />
 
                     {/* Error message for login failure from API */}

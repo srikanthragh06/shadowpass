@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { registerAPI } from "../api/auth";
 import { generateMasterToken, generateVaultKey } from "../utils/crypto";
+import { useNavigate } from "react-router-dom";
 
 /**
  * Custom hook to manage the signup page logic and state.
@@ -10,6 +11,8 @@ import { generateMasterToken, generateVaultKey } from "../utils/crypto";
  * @returns {object} - Signup form state, handlers, mutation, and error/loading states.
  */
 const useSignupPage = () => {
+    const navigate = useNavigate();
+
     const [signupFormDetails, setSignupFormDetails] = useState<{
         username: string;
         masterPassword: string;
@@ -41,7 +44,8 @@ const useSignupPage = () => {
             registerAPI({ username, masterToken }),
         onSuccess: (data) => {
             if (data?.data?.message) {
-                // Redirect to dashboard or another page after successful signup
+                // Redirect to dashboard
+                navigate("/dashboard");
             }
         },
         onSettled: () => setClientSignupError(null),

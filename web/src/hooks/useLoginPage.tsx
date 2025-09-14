@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { loginAPI } from "../api/auth";
 import { generateMasterToken, generateVaultKey } from "../utils/crypto";
+import { useNavigate } from "react-router-dom";
 
 /**
  * Custom hook to manage the login page logic and state.
@@ -10,6 +11,8 @@ import { generateMasterToken, generateVaultKey } from "../utils/crypto";
  * @returns {object} - Login form state, handlers, mutation, and error/loading states.
  */
 const useLoginPage = () => {
+    const navigate = useNavigate();
+
     // State for login form fields
     const [loginFormDetails, setLoginFormDetails] = useState<{
         username: string;
@@ -40,7 +43,8 @@ const useLoginPage = () => {
             loginAPI({ username, masterToken }),
         onSuccess: (data) => {
             if (data?.data?.message) {
-                // Redirect to dashboard or another page after successful login
+                // Redirect to dashboard
+                navigate("/dashboard");
             }
         },
         onSettled: () => setClientLoginError(null),
