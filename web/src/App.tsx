@@ -8,6 +8,7 @@ import "./index.css";
 import type { JSX } from "react";
 import SignupPage from "./pages/signup/SignupPage";
 import NotFoundPage from "./pages/notFound/NotFoundPage";
+import LoginPage from "./pages/login/LoginPage";
 
 /**
  * The main application component.
@@ -45,6 +46,18 @@ function App(): JSX.Element {
              * The element to render for the signup page.
              */
             element: <SignupPage />,
+        },
+        {
+            /**
+             * The route for the login page.
+             *
+             * This route matches the URL path "/login" and renders the <LoginPage /> element.
+             */
+            path: "/login",
+            /**
+             * The element to render for the login page.
+             */
+            element: <LoginPage />,
         },
         {
             /**
