@@ -1,7 +1,7 @@
 import MainPage from "../../components/MainPage";
 
 const DashboardPage = () => {
-    return <MainPage></MainPage>;
+    return <MainPage showNavbar={true} className="items-center"></MainPage>;
 };
 
 export default DashboardPage;

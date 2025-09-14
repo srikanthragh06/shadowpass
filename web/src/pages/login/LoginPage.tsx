@@ -24,7 +24,7 @@ const LoginPage = () => {
     } = useLoginPage();
 
     return (
-        <MainPage className="items-center">
+        <MainPage showNavbar={false} className="items-center">
             {/* Login form container */}
             <div
                 className="

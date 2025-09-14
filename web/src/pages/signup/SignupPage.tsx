@@ -27,7 +27,7 @@ const SignupPage = () => {
 
     // Render the signup form inside the MainPage layout
     return (
-        <MainPage className="items-center">
+        <MainPage showNavbar={false} className="items-center">
             {/* App title */}
             <div className="sm:text-5xl text-4xl kode-mono-bold mt-16">
                 shadowPass

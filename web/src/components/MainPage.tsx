@@ -1,24 +1,30 @@
 import type { ReactNode } from "react";
+import Navbar from "../pages/navbar/Navbar";
 
+/**
+ * Props for the MainPage component.
+ * @property {ReactNode} [children] - The content of the page.
+ * @property {string} [className] - Additional class names for styling.
+ * @property {boolean} showNavbar - Whether to display the navigation bar.
+ */
 type MainPageProps = {
     children?: ReactNode;
     className?: string;
+    showNavbar: boolean;
 };
 
 /**
- * The main application page component.
- *
- * This component provides a basic layout for the page, with a
- * vertically-stacked layout for the content.
+ * MainPage provides a basic layout for application pages, including optional navigation.
  *
  * @param {MainPageProps} props - The component props.
- * @param {ReactNode} [props.children] - The content of the page.
- * @param {string} [props.className] - The class name for the component.
- * @returns {JSX.Element} - The component.
+ * @returns {JSX.Element} The rendered main page layout.
  */
-const MainPage = ({ children, className = "" }: MainPageProps) => {
+const MainPage = ({ children, className = "", showNavbar }: MainPageProps) => {
     return (
         <div className={`w-full h-full flex flex-col ${className}`}>
+            {/* Conditionally render the navigation bar if showNavbar is true */}
+            {showNavbar && <Navbar />}
+            {/* Render the page content */}
             {children}
         </div>
     );
