@@ -171,3 +171,21 @@ export const loginHandler = async (
         next(err);
     }
 };
+
+export const authHandler = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+) => {
+    try {
+        const { username } = request as any;
+        return sendSuccessResponse(
+            request,
+            response,
+            `${username} authorized successfully!`,
+            200
+        );
+    } catch (err) {
+        next(err);
+    }
+};
