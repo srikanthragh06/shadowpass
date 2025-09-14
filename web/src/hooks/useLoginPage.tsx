@@ -1,7 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { loginAPI } from "../api/auth";
-import { setJwtToken } from "../utils/token";
 import { generateMasterToken, generateVaultKey } from "../utils/crypto";
 
 /**
@@ -40,8 +39,7 @@ const useLoginPage = () => {
         mutationFn: ({ username, masterToken }) =>
             loginAPI({ username, masterToken }),
         onSuccess: (data) => {
-            if (data?.data?.jwtToken) {
-                setJwtToken(data.data.jwtToken);
+            if (data?.data?.message) {
                 // Redirect to dashboard or another page after successful login
             }
         },

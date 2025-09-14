@@ -2,7 +2,6 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { registerAPI } from "../api/auth";
 import { generateMasterToken, generateVaultKey } from "../utils/crypto";
-import { setJwtToken } from "../utils/token";
 
 /**
  * Custom hook to manage the signup page logic and state.
@@ -41,8 +40,7 @@ const useSignupPage = () => {
         mutationFn: ({ username, masterToken }) =>
             registerAPI({ username, masterToken }),
         onSuccess: (data) => {
-            if (data?.data?.jwtToken) {
-                setJwtToken(data.data.jwtToken);
+            if (data?.data?.message) {
                 // Redirect to dashboard or another page after successful signup
             }
         },
