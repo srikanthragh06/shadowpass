@@ -1,18 +1,22 @@
 import { NextFunction, Request, Response } from "express";
-import { checkAndGetJWTToken } from "../utils/authorization";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config";
 import { sendClientSideError } from "../utils/responseTemplates";
 import { queryClient, transaction } from "../db/postgres";
 
 /**
+ * Middleware to check authentication using JWT token in cookies.
+ *
+ * - Verifies the presence and validity of the JWT token in the request cookies.
+ * - If valid, checks if the user exists in the database.
+ * - If the user exists, attaches the username to the request object and calls next middleware.
+ * - Otherwise, sends a 401 Unauthorized error response.
+ *
  * @function checkAuth
- * @description A middleware function that verifies the presence of a valid JWT
- * token in the Authorization header. If the token is valid, it verifies the
- * user exists in the database.
  * @param {Request} request - The Express request object
  * @param {Response} response - The Express response object
  * @param {NextFunction} next - The Express next middleware function
+ * @returns {Promise<void>}
  */
 export const checkAuth = async (
     request: Request,
@@ -20,13 +24,24 @@ export const checkAuth = async (
     next: NextFunction
 ) => {
     try {
-        const jwtToken = checkAndGetJWTToken(request, response, next) as string;
+        // Extract JWT token from cookies
+        const { jwtToken } = request.cookies;
+        if (!jwtToken) {
+            // No token found, send 401 Unauthorized
+            return sendClientSideError(
+                request,
+                response,
+                `Authorization cookies do not exist`,
+                401
+            );
+        }
+
         let decodedToken: jwt.JwtPayload;
         try {
             // Verify the JWT token
             decodedToken = jwt.verify(jwtToken, JWT_SECRET) as jwt.JwtPayload;
         } catch (err) {
-            // If the token is invalid or expired, return a 401 Unauthorized response
+            // Token is invalid or expired, send 401 Unauthorized
             return sendClientSideError(
                 request,
                 response,
@@ -36,7 +51,7 @@ export const checkAuth = async (
         }
 
         const { username } = decodedToken;
-        // Verify the user exists in the database
+        // Check if the user exists in the database
         await transaction(async (client) => {
             const { rows: rowsWithUsername } = await queryClient(
                 client,
@@ -47,7 +62,7 @@ export const checkAuth = async (
                 rowsWithUsername.length === 0 ||
                 rowsWithUsername[0].username !== username
             ) {
-                // If the user does not exist, return a 401 Unauthorized response
+                // User does not exist, send 401 Unauthorized
                 return sendClientSideError(
                     request,
                     response,
@@ -56,12 +71,12 @@ export const checkAuth = async (
                 );
             }
 
-            // If the user exists, add the username to the request object
-            // and call the next middleware
+            // User exists, attach username to request and proceed
             (request as any).username = username;
             next();
         });
     } catch (err) {
+        // Pass error to next middleware
         next(err);
     }
 };

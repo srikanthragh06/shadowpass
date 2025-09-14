@@ -9,9 +9,17 @@ import { JWT_SECRET } from "../config";
 
 /**
  * Handles the registration of a new user.
- * @param request The express request object.
- * @param response The express response object.
- * @param next The express next middleware function.
+ *
+ * - Checks if the username already exists in the Vaults table.
+ * - If not, creates a new Vault and Settings entry for the user.
+ * - Generates a JWT token and sets it as an HTTP-only cookie.
+ * - Returns a success or error response.
+ *
+ * @function registerHandler
+ * @param {Request} request - The express request object.
+ * @param {Response} response - The express response object.
+ * @param {NextFunction} next - The express next middleware function.
+ * @returns {Promise<void>}
  */
 export const registerHandler = async (
     request: Request,
@@ -29,7 +37,7 @@ export const registerHandler = async (
                 [username]
             );
             if (rowsFromUsernameAndMasterToken.length > 0) {
-                // If the user already exists, return a 401 Unauthorized response
+                // User already exists, return 401 Unauthorized
                 return sendClientSideError(
                     request,
                     response,
@@ -38,7 +46,7 @@ export const registerHandler = async (
                 );
             }
 
-            // Insert the new user into the Vault table
+            // Insert the new user into the Vaults table
             const { rows: rowsWithVaultId } = await queryClient(
                 client,
                 `INSERT INTO "Vaults" ("username", "masterToken") VALUES ($1, $2) RETURNING "id";`,
@@ -64,28 +72,39 @@ export const registerHandler = async (
                 { expiresIn: autoLockTimeInterval }
             );
 
+            // Set JWT token as HTTP-only cookie
+            response.cookie("jwtToken", jwtToken, {
+                httpOnly: true, // Cannot be accessed by JavaScript
+                secure: true, // Only sent over HTTPS
+                sameSite: "strict", // Prevent CSRF
+            });
+
             // Return a 201 Created response with the JWT token
             return sendSuccessResponse(
                 request,
                 response,
                 "Registration successful!",
-                201,
-                {
-                    jwtToken,
-                }
+                201
             );
         });
     } catch (err) {
-        // If an error occurs, call the next middleware function with the error
         next(err);
     }
 };
 
 /**
- * Handles a login request.
- * @param request The Express request object.
- * @param response The Express response object.
- * @param next The Express next middleware function.
+ * Handles a login request for an existing user.
+ *
+ * - Verifies the username and masterToken against the Vaults table.
+ * - If valid, fetches the user's autoLockTimeInterval from Settings.
+ * - Generates a JWT token and sets it as an HTTP-only cookie.
+ * - Returns a success or error response.
+ *
+ * @function loginHandler
+ * @param {Request} request - The express request object.
+ * @param {Response} response - The express response object.
+ * @param {NextFunction} next - The express next middleware function.
+ * @returns {Promise<void>}
  */
 export const loginHandler = async (
     request: Request,
@@ -95,7 +114,7 @@ export const loginHandler = async (
     try {
         const { username, masterToken } = request.body;
 
-        // Check if the user exists in the Vault table
+        // Check if the user exists in the Vaults table
         await transaction(async (client) => {
             const { rows: rowsFromUsernameAndMasterToken } = await queryClient(
                 client,
@@ -103,7 +122,7 @@ export const loginHandler = async (
                 [username, masterToken]
             );
             if (rowsFromUsernameAndMasterToken.length === 0) {
-                // If the user does not exist, return a 401 Unauthorized response
+                // User does not exist, return 401 Unauthorized
                 return sendClientSideError(
                     request,
                     response,
@@ -133,19 +152,22 @@ export const loginHandler = async (
                 { expiresIn: autoLockTimeInterval }
             );
 
+            // Set JWT token as HTTP-only cookie
+            response.cookie("jwtToken", jwtToken, {
+                httpOnly: true, // Cannot be accessed by JavaScript
+                secure: true, // Only sent over HTTPS
+                sameSite: "strict", // Prevent CSRF
+            });
+
             // Return a 200 OK response with the JWT token
             return sendSuccessResponse(
                 request,
                 response,
                 "Login successful!",
-                200,
-                {
-                    jwtToken,
-                }
+                200
             );
         });
     } catch (err) {
-        // If an error occurs, call the next middleware function with the error
         next(err);
     }
 };
