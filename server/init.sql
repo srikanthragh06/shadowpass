@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS "Vaults" (
 );
 
 CREATE INDEX idx_vault_mastertoken_username
-ON "Vaults" ("masterToken", "username");
+ON "Vaults" ("username","masterToken");
 
 CREATE TABLE IF NOT EXISTS "Settings" (
     "id" SERIAL PRIMARY KEY,
